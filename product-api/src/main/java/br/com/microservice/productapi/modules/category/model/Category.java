@@ -1,7 +1,6 @@
-package br.com.microservice.productapi.modules.product.model;
+package br.com.microservice.productapi.modules.category.model;
 
-import br.com.microservice.productapi.modules.product.dto.CategoryRequest;
-import br.com.microservice.productapi.modules.product.dto.CategoryResponse;
+import br.com.microservice.productapi.modules.category.dto.CategoryRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
