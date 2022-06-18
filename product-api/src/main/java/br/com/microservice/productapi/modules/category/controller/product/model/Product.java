@@ -1,15 +1,12 @@
-package br.com.microservice.productapi.modules.product.model;
+package br.com.microservice.productapi.modules.category.controller.product.model;
 
-import br.com.microservice.productapi.modules.category.dto.CategoryRequest;
+import br.com.microservice.productapi.modules.category.controller.product.dto.ProductRequest;
 import br.com.microservice.productapi.modules.category.model.Category;
-import br.com.microservice.productapi.modules.product.dto.ProductRequest;
 import br.com.microservice.productapi.modules.supplier.model.Supplier;
-import br.com.microservice.productapi.modules.supplier.service.SupplierService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.BeanUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

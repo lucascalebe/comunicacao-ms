@@ -1,7 +1,7 @@
-package br.com.microservice.productapi.modules.product.dto;
+package br.com.microservice.productapi.modules.category.controller.product.dto;
 
 import br.com.microservice.productapi.modules.category.dto.CategoryResponse;
-import br.com.microservice.productapi.modules.product.model.Product;
+import br.com.microservice.productapi.modules.category.controller.product.model.Product;
 import br.com.microservice.productapi.modules.supplier.dto.SupplierResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,7 +10,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
 
@@ -23,6 +22,7 @@ public class ProductResponse {
 
   private Integer id;
   private String name;
+  @JsonProperty("quantity_available")
   private Integer quantityAvailable;
   @JsonProperty("created_at")
   @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
