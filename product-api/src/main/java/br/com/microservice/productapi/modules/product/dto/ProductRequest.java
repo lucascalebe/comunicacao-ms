@@ -1,4 +1,4 @@
-package br.com.microservice.productapi.modules.category.controller.product.dto;
+package br.com.microservice.productapi.modules.product.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

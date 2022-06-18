@@ -1,11 +1,11 @@
-package br.com.microservice.productapi.modules.category.controller.product.service;
+package br.com.microservice.productapi.modules.product.service;
 
 import br.com.microservice.productapi.config.exception.ValidationException;
-import br.com.microservice.productapi.modules.category.controller.product.repository.ProductRepository;
+import br.com.microservice.productapi.modules.product.repository.ProductRepository;
 import br.com.microservice.productapi.modules.category.service.CategoryService;
-import br.com.microservice.productapi.modules.category.controller.product.dto.ProductRequest;
-import br.com.microservice.productapi.modules.category.controller.product.dto.ProductResponse;
-import br.com.microservice.productapi.modules.category.controller.product.model.Product;
+import br.com.microservice.productapi.modules.product.dto.ProductRequest;
+import br.com.microservice.productapi.modules.product.dto.ProductResponse;
+import br.com.microservice.productapi.modules.product.model.Product;
 import br.com.microservice.productapi.modules.supplier.service.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

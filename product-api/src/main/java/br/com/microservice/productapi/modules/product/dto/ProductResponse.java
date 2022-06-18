@@ -1,7 +1,7 @@
-package br.com.microservice.productapi.modules.category.controller.product.dto;
+package br.com.microservice.productapi.modules.product.dto;
 
 import br.com.microservice.productapi.modules.category.dto.CategoryResponse;
-import br.com.microservice.productapi.modules.category.controller.product.model.Product;
+import br.com.microservice.productapi.modules.product.model.Product;
 import br.com.microservice.productapi.modules.supplier.dto.SupplierResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;

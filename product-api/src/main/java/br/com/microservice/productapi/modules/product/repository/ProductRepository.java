@@ -1,6 +1,6 @@
-package br.com.microservice.productapi.modules.category.controller.product.repository;
+package br.com.microservice.productapi.modules.product.repository;
 
-import br.com.microservice.productapi.modules.category.controller.product.model.Product;
+import br.com.microservice.productapi.modules.product.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
