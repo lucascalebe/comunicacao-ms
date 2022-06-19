@@ -1,8 +1,8 @@
 package br.com.microservice.productapi.modules.supplier.service;
 
+import br.com.microservice.productapi.config.SuccessResponse;
 import br.com.microservice.productapi.config.exception.ValidationException;
-import br.com.microservice.productapi.modules.category.dto.CategoryResponse;
-import br.com.microservice.productapi.modules.category.model.Category;
+import br.com.microservice.productapi.modules.product.service.ProductService;
 import br.com.microservice.productapi.modules.supplier.dto.SupplierRequest;
 import br.com.microservice.productapi.modules.supplier.dto.SupplierResponse;
 import br.com.microservice.productapi.modules.supplier.model.Supplier;
@@ -21,15 +21,16 @@ public class SupplierService {
   @Autowired
   private SupplierRepository supplierRepository;
 
+  @Autowired
+  private ProductService productService;
+
   public Supplier findById(Integer id) {
     return supplierRepository.findById(id)
             .orElseThrow(() -> new ValidationException("There's no supplier for the given id"));
   }
 
   public SupplierResponse findByIdResponse(Integer id) {
-    if (isEmpty(id)) {
-      throw new ValidationException("The supplier ID was not informed.");
-    }
+    validateInformedId(id);
     return SupplierResponse.of(findById(id));
   }
   public List<SupplierResponse> findAll() {
@@ -44,9 +45,35 @@ public class SupplierService {
     return supplierRepository.findByNameIgnoreCaseContaining(name)
             .stream().map(SupplierResponse::of).collect(Collectors.toList());
   }
+
+  public SuccessResponse delete(Integer id) {
+    validateInformedId(id);
+    if (productService.existsBySupplierId(id)) {
+      throw new ValidationException("You cannot delete this supplier because it's already defined by a product.");
+    }
+    findById(id);
+    supplierRepository.deleteById(id);
+    return SuccessResponse.create("Supplier was deleted.");
+  }
+
+  private void validateInformedId(Integer id) {
+    if (isEmpty(id)) {
+      throw new ValidationException("The supplier id must be informed");
+    }
+  }
+
   public SupplierResponse save(SupplierRequest request) {
     this.validateSupplierNameInformed(request);
     var supplier = supplierRepository.save(Supplier.of(request));
+    return SupplierResponse.of(supplier);
+  }
+
+  public SupplierResponse update(SupplierRequest request, Integer id) {
+    this.validateInformedId(id);
+    this.validateSupplierNameInformed(request);
+    var supplier = Supplier.of(request);
+    supplier.setId(id);
+    supplierRepository.save(supplier);
     return SupplierResponse.of(supplier);
   }
 

@@ -1,13 +1,15 @@
 package br.com.microservice.productapi.modules.product.service;
 
+import br.com.microservice.productapi.config.SuccessResponse;
 import br.com.microservice.productapi.config.exception.ValidationException;
-import br.com.microservice.productapi.modules.category.dto.CategoryResponse;
-import br.com.microservice.productapi.modules.category.model.Category;
-import br.com.microservice.productapi.modules.product.repository.ProductRepository;
 import br.com.microservice.productapi.modules.category.service.CategoryService;
 import br.com.microservice.productapi.modules.product.dto.ProductRequest;
 import br.com.microservice.productapi.modules.product.dto.ProductResponse;
 import br.com.microservice.productapi.modules.product.model.Product;
+import br.com.microservice.productapi.modules.product.repository.ProductRepository;
+import br.com.microservice.productapi.modules.supplier.dto.SupplierRequest;
+import br.com.microservice.productapi.modules.supplier.dto.SupplierResponse;
+import br.com.microservice.productapi.modules.supplier.model.Supplier;
 import br.com.microservice.productapi.modules.supplier.service.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,9 +38,7 @@ public class ProductService {
   }
 
   public ProductResponse findByIdResponse(Integer id) {
-    if (isEmpty(id)) {
-      throw new ValidationException("The product ID was not informed.");
-    }
+    validateInformedId(id);
     return ProductResponse.of(findById(id));
   }
 
@@ -71,6 +71,14 @@ public class ProductService {
             .stream().map(ProductResponse::of).collect(Collectors.toList());
   }
 
+  public Boolean existsByCategoryId(Integer categoryId) {
+    return productRepository.existsByCategoryId(categoryId);
+  }
+
+  public Boolean existsBySupplierId(Integer supplierId) {
+    return productRepository.existsBySupplierId(supplierId);
+  }
+
   public ProductResponse save(ProductRequest request) {
     this.validateProductDataInformed(request);
     this.validateCategoryAndSupplierIdInformed(request);
@@ -80,6 +88,19 @@ public class ProductService {
 
     var product = productRepository.save(Product.of(request, category, supplier));
 
+    return ProductResponse.of(product);
+  }
+
+  public ProductResponse update(ProductRequest request, Integer id) {
+    validateInformedId(id);
+    this.validateProductDataInformed(request);
+    this.validateCategoryAndSupplierIdInformed(request);
+
+    var category = categoryService.findById(request.getCategoryId());
+    var supplier = supplierService.findById(request.getSupplierId());
+    var product = Product.of(request, category, supplier);
+    product.setId(id);
+    productRepository.save(product);
     return ProductResponse.of(product);
   }
 
@@ -105,5 +126,18 @@ public class ProductService {
     if (isEmpty(request.getSupplierId())) {
       throw new ValidationException("The supplier ID was not informed.");
     }
+  }
+
+  private void validateInformedId(Integer id) {
+    if (isEmpty(id)) {
+      throw new ValidationException("The product id must be informed");
+    }
+  }
+
+  public SuccessResponse delete(Integer id) {
+    validateInformedId(id);
+    findById(id);
+    productRepository.deleteById(id);
+    return SuccessResponse.create("Product was deleted.");
   }
 }
