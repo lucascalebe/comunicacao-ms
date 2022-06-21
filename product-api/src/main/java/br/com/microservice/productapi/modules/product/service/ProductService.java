@@ -5,11 +5,9 @@ import br.com.microservice.productapi.config.exception.ValidationException;
 import br.com.microservice.productapi.modules.category.service.CategoryService;
 import br.com.microservice.productapi.modules.product.dto.ProductRequest;
 import br.com.microservice.productapi.modules.product.dto.ProductResponse;
+import br.com.microservice.productapi.modules.product.dto.ProductStockDTO;
 import br.com.microservice.productapi.modules.product.model.Product;
 import br.com.microservice.productapi.modules.product.repository.ProductRepository;
-import br.com.microservice.productapi.modules.supplier.dto.SupplierRequest;
-import br.com.microservice.productapi.modules.supplier.dto.SupplierResponse;
-import br.com.microservice.productapi.modules.supplier.model.Supplier;
 import br.com.microservice.productapi.modules.supplier.service.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -139,5 +137,9 @@ public class ProductService {
     findById(id);
     productRepository.deleteById(id);
     return SuccessResponse.create("Product was deleted.");
+  }
+
+  public void updateProductStock(ProductStockDTO product) {
+
   }
 }

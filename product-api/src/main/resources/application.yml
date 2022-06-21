@@ -19,18 +19,6 @@ spring:
     username: ${RABBIT_MQ_USER:guest}
     password: ${RABBIT_MQ_PASSWORD:guest}
 
-  rabbit:
-    exchange:
-      product: product.topic
-
-    routingKey:
-      product-stock: product-stock-update.routingKey
-      sales-confirmation: sales-confirmation.routingKey
-
-    queue:
-      product-stock: product-stock-update.queue
-      sales-confirmation: sales-confirmation.queue
-
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -48,3 +36,15 @@ spring:
 app-config:
   secrets:
     api-secret: ${API_SECRET:YXV0aC1hcGktc2VjcmV0LWRldi0xMjM0NTY=}
+
+  rabbit:
+    exchange:
+      product: product.topic
+
+    routingKey:
+      product-stock: product-stock-update.routingKey
+      sales-confirmation: sales-confirmation.routingKey
+
+    queue:
+      product-stock: product-stock-update.queue
+      sales-confirmation: sales-confirmation.queue
