@@ -3,6 +3,7 @@ package br.com.microservice.productapi.modules.product.service;
 import br.com.microservice.productapi.config.SuccessResponse;
 import br.com.microservice.productapi.config.exception.ValidationException;
 import br.com.microservice.productapi.modules.category.service.CategoryService;
+import br.com.microservice.productapi.modules.product.dto.ProductCheckStockRequest;
 import br.com.microservice.productapi.modules.product.dto.ProductQuantityDTO;
 import br.com.microservice.productapi.modules.product.dto.ProductRequest;
 import br.com.microservice.productapi.modules.product.dto.ProductResponse;
@@ -214,6 +215,25 @@ public class ProductService {
     } catch (Exception e) {
       throw new ValidationException("There was an error trying to get the product's sales.");
 
+    }
+  }
+
+  public SuccessResponse checkProductsStock(ProductCheckStockRequest request) {
+    if (isEmpty(request) || isEmpty(request.getProducts())) {
+      throw new ValidationException("The request data must be informed.");
+    }
+
+    request.getProducts().forEach(this::validateStock);
+    return SuccessResponse.create("The stock is ok.");
+  }
+
+  private void validateStock(ProductQuantityDTO productQuantity) {
+    if (isEmpty(productQuantity.getProductId()) || isEmpty(productQuantity.getQuantity())) {
+      throw new ValidationException("Product ID and quantity must be informed.");
+    }
+    var product = findById(productQuantity.getProductId());
+    if (productQuantity.getQuantity() > product.getQuantityAvailable()) {
+      throw new ValidationException(String.format("The product %s is out of stock!", product.getId()));
     }
   }
 }

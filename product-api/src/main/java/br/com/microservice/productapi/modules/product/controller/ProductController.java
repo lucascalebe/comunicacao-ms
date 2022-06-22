@@ -1,6 +1,7 @@
 package br.com.microservice.productapi.modules.product.controller;
 
 import br.com.microservice.productapi.config.SuccessResponse;
+import br.com.microservice.productapi.modules.product.dto.ProductCheckStockRequest;
 import br.com.microservice.productapi.modules.product.dto.ProductRequest;
 import br.com.microservice.productapi.modules.product.dto.ProductResponse;
 import br.com.microservice.productapi.modules.product.dto.ProductSalesResponse;
@@ -64,8 +65,13 @@ public class ProductController {
     return productService.update(request, id);
   }
 
+  @PostMapping("check-stock")
+  public SuccessResponse checkProductStock(@RequestBody ProductCheckStockRequest request) {
+    return productService.checkProductsStock(request);
+  }
+
   @GetMapping("{productId}/sales")
-  public ProductSalesResponse findProductSales(@PathVariable Integer id) {
-    return productService.findProductSales(id);
+  public ProductSalesResponse findProductSales(@PathVariable Integer productId) {
+    return productService.findProductSales(productId);
   }
 }
