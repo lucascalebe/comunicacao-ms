@@ -3,21 +3,29 @@ package br.com.microservice.productapi.modules.product.service;
 import br.com.microservice.productapi.config.SuccessResponse;
 import br.com.microservice.productapi.config.exception.ValidationException;
 import br.com.microservice.productapi.modules.category.service.CategoryService;
+import br.com.microservice.productapi.modules.product.dto.ProductQuantityDTO;
 import br.com.microservice.productapi.modules.product.dto.ProductRequest;
 import br.com.microservice.productapi.modules.product.dto.ProductResponse;
 import br.com.microservice.productapi.modules.product.dto.ProductStockDTO;
 import br.com.microservice.productapi.modules.product.model.Product;
 import br.com.microservice.productapi.modules.product.repository.ProductRepository;
+import br.com.microservice.productapi.modules.sales.dto.SalesConfirmationDTO;
+import br.com.microservice.productapi.modules.sales.enums.SalesStatus;
+import br.com.microservice.productapi.modules.sales.rabbitmq.SalesConfirmationSender;
 import br.com.microservice.productapi.modules.supplier.service.SupplierService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
 
+@Slf4j
 @Service
 public class ProductService {
 
@@ -29,6 +37,9 @@ public class ProductService {
 
   @Autowired
   private SupplierService supplierService;
+
+  @Autowired
+  private SalesConfirmationSender salesConfirmationSender;
 
   public Product findById(Integer id) {
     return productRepository.findById(id)
@@ -139,7 +150,52 @@ public class ProductService {
     return SuccessResponse.create("Product was deleted.");
   }
 
-  public void updateProductStock(ProductStockDTO product) {
+  public void updateProductStock(ProductStockDTO productStockDTO) {
+    try {
+      validateStockUpdateData(productStockDTO);
+      updateStock(productStockDTO);
+    } catch (Exception e) {
+      log.error("Error while trying to update stock for message with error: {}", e.getMessage(), e);
+      var rejectedMessage = new SalesConfirmationDTO(productStockDTO.getSalesId(), SalesStatus.REJECTED);
+      salesConfirmationSender.sendSalesConfirmationMessage(rejectedMessage);
+    }
+  }
 
+  @Transactional
+  private void updateStock(ProductStockDTO productStockDTO) {
+    var productsForUpdate = new ArrayList<Product>();
+    productStockDTO.getProducts().forEach(salesProduct -> {
+      var existingProduct = findById(salesProduct.getProductId());
+      validateQuantityInStock(salesProduct, existingProduct);
+      existingProduct.updateStock(salesProduct.getQuantity());
+      productsForUpdate.add(existingProduct);
+    });
+    if (!isEmpty(productsForUpdate)) {
+      productRepository.saveAll(productsForUpdate);
+      var approvedMessage = new SalesConfirmationDTO(productStockDTO.getSalesId(), SalesStatus.APPROVED);
+      salesConfirmationSender.sendSalesConfirmationMessage(approvedMessage);
+    }
+  }
+
+  private void validateStockUpdateData(ProductStockDTO product) {
+    if (isEmpty(product) || isEmpty(product.getSalesId())) {
+      throw new ValidationException("The product data or sales id must be informed.");
+    }
+
+    if (isEmpty(product.getProducts())) {
+      throw new ValidationException("The sales' products must be informed.");
+    }
+
+    product.getProducts().forEach(salesProduct -> {
+      if (isEmpty(salesProduct.getQuantity()) || isEmpty(salesProduct.getProductId())) {
+        throw new ValidationException("The product ID and quantity must be informed.");
+      }
+    });
+  }
+
+  public void validateQuantityInStock(ProductQuantityDTO salesProduct, Product existingProduct) {
+    if (salesProduct.getQuantity() > existingProduct.getQuantityAvailable()) {
+      throw new ValidationException(String.format("The product %s is out of Stock", existingProduct.getId()));
+    }
   }
 }
