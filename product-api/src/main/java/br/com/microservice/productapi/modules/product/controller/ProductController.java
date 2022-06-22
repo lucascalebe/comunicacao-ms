@@ -1,10 +1,9 @@
 package br.com.microservice.productapi.modules.product.controller;
 
 import br.com.microservice.productapi.config.SuccessResponse;
-import br.com.microservice.productapi.modules.category.dto.CategoryRequest;
-import br.com.microservice.productapi.modules.category.dto.CategoryResponse;
 import br.com.microservice.productapi.modules.product.dto.ProductRequest;
 import br.com.microservice.productapi.modules.product.dto.ProductResponse;
+import br.com.microservice.productapi.modules.product.dto.ProductSalesResponse;
 import br.com.microservice.productapi.modules.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -63,5 +62,10 @@ public class ProductController {
   @PutMapping("/{id}")
   public ProductResponse update(@RequestBody ProductRequest request , @PathVariable Integer id) {
     return productService.update(request, id);
+  }
+
+  @GetMapping("{productId}/sales")
+  public ProductSalesResponse findProductSales(@PathVariable Integer id) {
+    return productService.findProductSales(id);
   }
 }

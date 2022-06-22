@@ -6,9 +6,11 @@ import br.com.microservice.productapi.modules.category.service.CategoryService;
 import br.com.microservice.productapi.modules.product.dto.ProductQuantityDTO;
 import br.com.microservice.productapi.modules.product.dto.ProductRequest;
 import br.com.microservice.productapi.modules.product.dto.ProductResponse;
+import br.com.microservice.productapi.modules.product.dto.ProductSalesResponse;
 import br.com.microservice.productapi.modules.product.dto.ProductStockDTO;
 import br.com.microservice.productapi.modules.product.model.Product;
 import br.com.microservice.productapi.modules.product.repository.ProductRepository;
+import br.com.microservice.productapi.modules.sales.client.SalesClient;
 import br.com.microservice.productapi.modules.sales.dto.SalesConfirmationDTO;
 import br.com.microservice.productapi.modules.sales.enums.SalesStatus;
 import br.com.microservice.productapi.modules.sales.rabbitmq.SalesConfirmationSender;
@@ -40,6 +42,9 @@ public class ProductService {
 
   @Autowired
   private SalesConfirmationSender salesConfirmationSender;
+
+  @Autowired
+  private SalesClient salesClient;
 
   public Product findById(Integer id) {
     return productRepository.findById(id)
@@ -196,6 +201,19 @@ public class ProductService {
   public void validateQuantityInStock(ProductQuantityDTO salesProduct, Product existingProduct) {
     if (salesProduct.getQuantity() > existingProduct.getQuantityAvailable()) {
       throw new ValidationException(String.format("The product %s is out of Stock", existingProduct.getId()));
+    }
+  }
+
+  public ProductSalesResponse findProductSales(Integer id) {
+    var product = findById(id);
+    try {
+      var sales = salesClient.findSalesByProductId(product.getId())
+              .orElseThrow(() -> new ValidationException("The sales was not found by this product."));
+
+      return ProductSalesResponse.of(product, sales.getSalesIds());
+    } catch (Exception e) {
+      throw new ValidationException("There was an error trying to get the product's sales.");
+
     }
   }
 }
