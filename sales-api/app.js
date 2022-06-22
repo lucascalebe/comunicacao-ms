@@ -1,8 +1,12 @@
 import express from "express";
 
+import { connect } from "./src/config/db/MongoDbConfig.js";
+
 const app = express();
 const env = process.env;
 const PORT = env.PORT || 8082;
+
+connect();
 
 app.get('/api/status', (req, res) => {
     return res.json({
