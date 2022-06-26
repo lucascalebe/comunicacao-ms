@@ -8,7 +8,9 @@ import {
     SALES_CONFIRMATION_ROUTING_KEY
 } from "./queue.js";
 
-const HALF_SECOND = 500;
+import { listenToSalesConfirmationQueue } from '../../modules/sales/rabbitmq/salesConfirmationListener.js'
+
+const TWO_SECONDS = 2000;
 const HALF_MINUTE = 30000;
 const CONTAINER_ENV = "container";
 
@@ -36,8 +38,11 @@ async function connectRabbitMqAndCreateQueues() {
         console.log("Queue and topics were defined.")
         setTimeout(function () {
             connection.close();
-        }, HALF_SECOND);
+        }, TWO_SECONDS);
     });
+    setTimeout(function () {
+        listenToSalesConfirmationQueue()
+    }, TWO_SECONDS);
 }
 
 function createQueue(connection, queue, routingKey, topic) {
