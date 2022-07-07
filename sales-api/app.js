@@ -6,11 +6,13 @@ import { createInitialData } from "./src/config/db/initialData.js";
 import checkToken from "./src/config/auth/checkToken.js";
 import { sendMessageToProductStockUpdateQueue } from "./src/modules/product/rabbitmq/productStockUpdateSender.js";
 import orderRoutes from "./src/modules/sales/routes/OrderRoutes.js";
+import tracing from './src/config/tracing.js';
 
 const app = express();
 const env = process.env;
 const PORT = env.PORT || 8082;
 
+app.use(tracing);
 connectMongoDb();
 //createInitialData();
 connectRabbitMq();
