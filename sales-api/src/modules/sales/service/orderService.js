@@ -16,7 +16,7 @@ class OrderService {
             this.validateOrderData(orderData);
             const { authUser } = req;
             const { authorization } = req.headers;
-            let order = this.createInitalOrderData(orderData, authUser);
+            let order = this.createInitalOrderData(orderData, authUser, transactionid, serviceid);
             await this.validateProductStock(order, authorization, transactionid);
             let createdOrder = await OrderRepository.save(order);
             this.sendMessage(createdOrder, transactionid);
@@ -35,12 +35,14 @@ class OrderService {
         }
     }
 
-    createInitalOrderData(orderData, authUser) {
+    createInitalOrderData(orderData, authUser, transactionid, serviceid) {
         return {
             status: PENDING,
             user: authUser,
             createdAt: new Date(),
             updatedAt: new Date(),
+            transactionid,
+            serviceid,
             products: orderData.products
         }
     }

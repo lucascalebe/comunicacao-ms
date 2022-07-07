@@ -14,7 +14,7 @@ const PORT = env.PORT || 8082;
 
 app.use(tracing);
 connectMongoDb();
-//createInitialData();
+createInitialData();
 connectRabbitMq();
 
 app.use(express.json());
