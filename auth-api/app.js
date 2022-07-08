@@ -6,13 +6,7 @@ import tracing from './src/config/tracing.js';
 const app = express();
 const env = process.env;
 const PORT = env.PORT || 8080;
-
-db.createInitalData();
-
-app.use(tracing);
-app.use(express.json());
-
-app.use(userRoutes);
+const CONTAINER_ENV = "container";
 
 app.get('/api/status', (req, res) => {
     return res.json({
@@ -21,6 +15,25 @@ app.get('/api/status', (req, res) => {
         httpStatus: 200
     })
 })
+
+app.use(express.json());
+
+startApplication();
+
+function startApplication() {
+    if (env.NODE_ENV !== CONTAINER_ENV) {
+        db.createInitalData();
+    }
+}
+
+app.get("/api/initial-data", (req,res) => {
+    db.createInitalData();
+    return res.json({message: "Data created." });
+})
+
+app.use(tracing);
+
+app.use(userRoutes);
 
 app.listen(PORT, () => {
     console.info(`Server started successfully at port ${PORT}`)

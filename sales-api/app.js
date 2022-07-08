@@ -11,38 +11,35 @@ import tracing from './src/config/tracing.js';
 const app = express();
 const env = process.env;
 const PORT = env.PORT || 8082;
+const CONTAINER_ENV="container";
+const THREE_MINUTES=180000;
 
-app.use(tracing);
-connectMongoDb();
-createInitialData();
-connectRabbitMq();
+startApplication();
+
+async function startApplication() {
+    if (CONTAINER_ENV === env.NODE_ENV) {
+        console.info("Waiting for RabbitMq and MongoDB to start...");
+        setInterval(() => {
+            connectMongoDb();
+            connectRabbitMq();
+        }, THREE_MINUTES);
+    } else {
+        connectMongoDb();
+        createInitialData();
+        connectRabbitMq();
+    }
+}
 
 app.use(express.json());
+
+app.get("/api/initial-data", (req,res) => {
+    createInitialData();
+    return res.json({message: "Data created." });
+})
+
+app.use(tracing);
 app.use(checkToken);
 app.use(orderRoutes);
-
-app.get('/test', (req, res) => {
-    try {
-        sendMessageToProductStockUpdateQueue([
-            {
-                productId: 1001,
-                quantity: 3
-            },
-            {
-                productId: 1002,
-                quantity: 2
-            },
-            {
-                productId: 1003,
-                quantity: 1
-            },
-        ])
-        return res.status(200).json({ status: 200 })
-    } catch (err) {
-       console.error(err)
-       return res.status(500).json({ error: true })
-    }
-})
 
 app.get('/api/status', async (req, res) => {
     return res.json({
