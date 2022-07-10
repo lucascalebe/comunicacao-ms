@@ -1,10 +1,9 @@
 import express from "express";
 
-import { connectMongoDb } from "./src/config/db/MongoDbConfig.js";
+import { connectMongoDb } from "./src/config/db/mongoDbConfig.js"
 import { connectRabbitMq } from "./src/config/rabbitmq/rabbitConfig.js"
 import { createInitialData } from "./src/config/db/initialData.js"; 
 import checkToken from "./src/config/auth/checkToken.js";
-import { sendMessageToProductStockUpdateQueue } from "./src/modules/product/rabbitmq/productStockUpdateSender.js";
 import orderRoutes from "./src/modules/sales/routes/OrderRoutes.js";
 import tracing from './src/config/tracing.js';
 
